@@ -2,7 +2,7 @@ import config
 from funs import environment_check
 from funs import deal_with_sub_json
 from funs import image_compression_and_save
-from getinfo import PhotoExifInfo
+
 
 
 if __name__ =='__main__':

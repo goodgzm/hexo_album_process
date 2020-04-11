@@ -1,13 +1,20 @@
 import exifread
 import requests
 import config
-
+import os
 
 class PhotoExifInfo():
     
     def __init__(self,photo_path):
         self.photo_path = photo_path
-        self.baidu_map_ak = "LrsHHZ2OArsUFeqIG9hc6vf8pHe57ZQD"
+        
+        if os.path.exists('vvdkey.py'):
+            from vvdkey import baidu_key
+            self.baidu_map_ak = baidu_key
+        else:
+            ## set your baidu map key here
+            self.baidu_map_ak = ""
+            
         self.image_info_dict={}
         self.tags ={}
         self.interested_keys = [
