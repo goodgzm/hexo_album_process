@@ -5,7 +5,7 @@ import cv2
 import shutil
 import logging
 import time
-
+from getinfo import PhotoExifInfo
 
 Album_Dict ={}
 
@@ -174,7 +174,13 @@ def image_compression_and_save(src_dir, tar_dir):
                         ## small image, copy directly
                         shutil.copy(image_path, tar_image_path)
                         log(f'image {os.path.join(sub_image_dir,item)} has been moved to temp dir')
-                        
+              
+              
+def get_image_info_dict(image_path):
+    
+    
+    a=3
+                      
         
 def deal_with_sub_json(src_dir, tar_dir):
     """
@@ -183,6 +189,7 @@ def deal_with_sub_json(src_dir, tar_dir):
     sub_image_dirs = os.listdir(src_dir)
     
     for sub_image_dir in sub_image_dirs:
+        
         src_sub_image_path = os.path.join(src_dir, sub_image_dir)
         tar_sub_image_path = os.path.join(tar_dir, sub_image_dir)
         
@@ -198,6 +205,13 @@ def deal_with_sub_json(src_dir, tar_dir):
             
         with open(src_info_json_file_path) as fp:
             album_info = json.load(fp)
-            print(album_info)
-
+        
+        file_list = os.listdir(src_sub_image_path)
+        for item in file_list:
+            extension = item.split('.')[-1]
+            
+            if extension in config.Parameters.Image_Extension_List:
+                ## is image file
+                image_path = os.path.join(src_sub_image_path, item)
+                image_info_dict = get_image_info_dict(image_path)
             

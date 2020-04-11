@@ -7,7 +7,7 @@ class PhotoExifInfo():
     
     def __init__(self,photo_path):
         self.photo_path = photo_path
-        self.baidu_map_ak = "your baidu map key"
+        self.baidu_map_ak = "LrsHHZ2OArsUFeqIG9hc6vf8pHe57ZQD"
         self.image_info_dict={}
         self.tags ={}
         self.interested_keys = [
