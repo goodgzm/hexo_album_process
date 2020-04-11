@@ -256,6 +256,24 @@ def json_integrate(temp_root):
     with open(integrate_json_path, mode='w', encoding='utf-8') as fp:
         json.dump(album_dict, fp, ensure_ascii=False, indent=3)
         log(f'total json {integrate_json_path} saved')
-
         
-def make_dir_and_md_of_album():
+    return album_dict
+        
+def make_dir_and_md_of_album(hexo_photos_path, album_dict):
+    '''
+    save md files to hexo source/photos dir
+    '''
+    assert os.path.isdir(hexo_photos_path) ,'hexo photos path {hexo_photos_path} does not exist'
+    
+    for sub_image_dict in album_dict['album']:
+        image_dir = os.path.join(hexo_photos_path, sub_image_dict['directory'])
+        dir_check(image_dir)
+        
+        with open(os.path.join(image_dir,config.Parameters.Album_Md_File_Name),'w', encoding='utf-8') as fp:
+            fp.writelines('---'+'\n')
+            fp.writelines('title: '+sub_image_dict['title']+'\n')
+            fp.writelines('date: '+str(sub_image_dict['time']['year'])+'-'+str(sub_image_dict['time']['month'])+'-'+str(sub_image_dict['time']['day'])+'\n')
+            fp.writelines('type: photography'+'\n')
+            fp.writelines('album: '+sub_image_dict['directory']+'\n')
+            fp.writelines('---'+'\n')
+            log(f'create md file of {os.path.join(image_dir,config.Parameters.Album_Md_File_Name)}')

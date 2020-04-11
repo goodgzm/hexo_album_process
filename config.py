@@ -12,6 +12,7 @@ class Parameters:
     Album_Ddescription_File_Name = 'readme.json'                                # name of json file in each image dir
     Log_File_Name = 'Album_Log.log'                                             # name of log file
     Album_Total_Json = 'album.json'                                             # json info of album
+    Album_Md_File_Name = 'index.md'
     
     Logging_Object = None                                                       # object of logging class
     Image_Info_Get_Object = None                                                # instance of PhotoExifInfo
