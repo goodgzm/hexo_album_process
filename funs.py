@@ -7,7 +7,6 @@ import logging
 import time
 from getinfo import PhotoExifInfo
 
-Album_Dict ={}
 
 def log_init():
     """
@@ -152,7 +151,7 @@ def image_compression_and_save(src_dir, tar_dir):
         for item in file_list:
             extension = item.split('.')[-1]
             
-            if extension in config.Parameters.Image_Extension_List:
+            if extension.lower() in config.Parameters.Image_Extension_List:
                 ## is image file
                 image_path = os.path.join(src_sub_image_path, item)
                 
@@ -177,14 +176,7 @@ def image_compression_and_save(src_dir, tar_dir):
                         ## small image, copy directly
                         shutil.copy(image_path, tar_image_path)
                         log(f'image {os.path.join(sub_image_dir,item)} has been moved to temp dir')
-              
-              
-def get_image_info_dict(image_path):
-    
-    assert not config.Parameters.Image_Info_Get_Object is None, "Image_Info_Get_Object should be a instance "
-    image_info_dict = config.Parameters.Image_Info_Get_Object.get_image_info(image_path)
-    a=3
-                      
+                           
         
 def deal_with_sub_json(src_dir, tar_dir):
     """
@@ -211,11 +203,59 @@ def deal_with_sub_json(src_dir, tar_dir):
             album_info = json.load(fp)
         
         file_list = os.listdir(src_sub_image_path)
+        
+        image_info_list = []
+        
         for item in file_list:
             extension = item.split('.')[-1]
             
             if extension in config.Parameters.Image_Extension_List:
                 ## is image file
                 image_path = os.path.join(src_sub_image_path, item)
-                image_info_dict = get_image_info_dict(image_path)
+                
+                assert not config.Parameters.Image_Info_Get_Object is None, "Image_Info_Get_Object should be a instance "
+                image_info_dict = config.Parameters.Image_Info_Get_Object.get_image_info(image_path)                
+                
+                image_info_dict['url'] = config.Parameters.Image_Url_Prefix+sub_image_dir+'/'+item
+                
+                image_info_list.append(image_info_dict)
+                
+        album_info['image_info'] = image_info_list
+        album_info['directory'] = sub_image_dir
+        
+        tar_info_json_file_path = os.path.join(tar_sub_image_path, config.Parameters.Album_Ddescription_File_Name)      
+        
+        with open(tar_info_json_file_path,'w',encoding='utf-8') as fp:
+            json.dump(album_info, fp, indent=3, ensure_ascii=False)
+            log(f'json file of image dir {sub_image_dir} created')
             
+            
+def json_integrate(temp_root):
+    '''
+    integrate json files to a single file
+    '''
+    sub_image_dirs = os.listdir(temp_root)
+    
+    album_dict = {}
+    
+    album_json_list = []
+    
+    for sub_image_dir in sub_image_dirs:  
+        if os.path.isdir(os.path.join(temp_root,sub_image_dir)):
+            json_file_path = os.path.join(temp_root,sub_image_dir, config.Parameters.Album_Ddescription_File_Name)   
+            assert os.path.exists(json_file_path),f'file {json_file_path} not flund'
+            
+            with open(json_file_path) as fp:
+                json_dict = json.load(fp)
+            
+            album_json_list.append(json_dict)
+            
+    album_dict['album'] = album_json_list
+    
+    integrate_json_path = os.path.join(temp_root, config.Parameters.Album_Total_Json)
+    with open(integrate_json_path, mode='w', encoding='utf-8') as fp:
+        json.dump(album_dict, fp, ensure_ascii=False, indent=3)
+        log(f'total json {integrate_json_path} saved')
+
+        
+def make_dir_and_md_of_album():
