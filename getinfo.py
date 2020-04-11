@@ -5,8 +5,7 @@ import os
 
 class PhotoExifInfo():
     
-    def __init__(self,photo_path):
-        self.photo_path = photo_path
+    def __init__(self):
         
         if os.path.exists('vvdkey.py'):
             from vvdkey import baidu_key
@@ -15,63 +14,70 @@ class PhotoExifInfo():
             ## set your baidu map key here
             self.baidu_map_ak = ""
             
-        self.image_info_dict={}
-        self.tags ={}
         self.interested_keys = [
-            'EXIF ExposureMode',\
-            'EXIF ExposureTime',\
-            'EXIF Flash',\
-            'EXIF ISOSpeedRatings',\
-            'Image Model',\
-            'EXIF ExifImageWidth',\
-            'EXIF ExifImageLength',\
-            'Image DateTime',\
-            'EXIF DateTimeOriginal',\
-            'Image Make',\
-
-            # lens
-            # jiaoju
+            # camera Model
+            'Image Model',
+            # Aperture 1/value
+            'EXIF FNumber',
+            # Focal Length
+            'EXIF FocalLength',
+            # Exposure Mode
+            'EXIF ExposureMode',
+            # ExposureTime in seconds
+            'EXIF ExposureTime',
+            # ISO
+            'EXIF ISOSpeedRatings',
+            # date of photo
+            'Image DateTime',
         ]
         
         
-    def get_tags(self):
+    def get_image_info(self,image_path):
         """
         获取照片信息
         """
-        image_content = open(self.photo_path, 'rb')
-        tags = exifread.process_file(image_content)
-        self.tags = tags
+        image_info_dict={}
+        
+        with open(image_path, 'rb') as fp:
+            tags = exifread.process_file(fp)
+        
+        for j in tags:
+            print(f"{j} :{tags[j]}")
         
         for item in self.interested_keys:
+            
             try:
-                info = tags[item]
-                self.image_info_dict[item] = info
+                info = tags[item].printable
+                image_info_dict[item] = info
+                
             except:
-                print(f'{self.photo_path} has no attribute of {item}')                
+                print(f'{image_path} has no attribute of {item}')                
                 continue
             
-        # 遍历获取照片所有信息
-        #for j, k in tags.items():
-            #print(f"{j} : {k}")
-            #print('拍摄时间：', tags['EXIF DateTimeOriginal'])
-            #print('照相机制造商：', tags['Image Make'])
-            #print('照相机型号：', tags['Image Model'])
-            #print('照片尺寸：', tags['EXIF ExifImageWidth'], tags['EXIF ExifImageLength'])
-            
-     
-        image_content.close()
-       
-
-    def get_lng_lat(self):
-        """经纬度转换"""
-        tags = self.tags
         try:
+            localcation = self._get_city_info(tags)
+            if localcation != "":
+                image_info_dict['positon'] = localcation
+                
+        except:
+            print(f'{image_path} has no attribute of "GPS GPSLatitudeRef"')    
+            
+        return image_info_dict
+       
+       
+    def _get_lng_lat(self, tags):
+        """
+        经纬度转换
+        """
+        try:
+            
             # 纬度
             LatRef = tags["GPS GPSLatitudeRef"].printable
             Lat = tags["GPS GPSLatitude"].printable[1:-1].replace(" ", "").replace("/", ",").split(",")
             Lat = float(Lat[0]) + float(Lat[1]) / 60 + float(Lat[2]) / 3600
             if LatRef != "N":
                 Lat = Lat * (-1)
+                
             # 经度
             LonRef = tags["GPS GPSLongitudeRef"].printable
             Lon = tags["GPS GPSLongitude"].printable[1:-1].replace(" ", "").replace("/", ",").split(",")
@@ -84,32 +90,28 @@ class PhotoExifInfo():
 
 
 
-    def get_city_info(self):
-        result = self.get_lng_lat()
+    def _get_city_info(self, tags):
+        
+        result = self._get_lng_lat(tags)
         if result:
             Lat, Lon = result
             url = "https://api.map.baidu.com/reverse_geocoding/v3/?ak="+self.baidu_map_ak+"&output=json&coordtype=wgs84ll&location=" + str(Lat) + ',' + str(Lon)
-            url = "https://api.map.baidu.com/reverse_geocoding/v3/?ak="+self.baidu_map_ak+"&output=json&coordtype=wgs84ll&location=31.225696563611,121.49884033194"
+            #url = "https://api.map.baidu.com/reverse_geocoding/v3/?ak="+self.baidu_map_ak+"&output=json&coordtype=wgs84ll&location=31.225696563611,121.49884033194"
             response = requests.get(url).json()
             status = response['status']
             if status == 0:
                 address = response['result']['formatted_address']
                 if address != "":
-                    self.image_info_dict['Position'] = address
+                    return(address)
             else:
                 print('baidu_map error')
-    
-    
-    
-    def get_image_info(self):
-        self.get_tags()
-        self.get_city_info()
-        return self.image_info_dict
+        return ""
+
     
     
     
 if __name__ == '__main__':
-    result = PhotoExifInfo("test.jpeg").get_image_info()
+    result = PhotoExifInfo()
     
     for j, k in result.items():
         print(f"{j} : {k}")

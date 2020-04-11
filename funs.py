@@ -89,6 +89,9 @@ def environment_check():
     ## initialize logging
     log_init()
     
+    ## image_info_get object
+    config.Parameters.Image_Info_Get_Object = PhotoExifInfo()
+    
       
 def init_json_create(json_path):
     """
@@ -178,7 +181,8 @@ def image_compression_and_save(src_dir, tar_dir):
               
 def get_image_info_dict(image_path):
     
-    
+    assert not config.Parameters.Image_Info_Get_Object is None, "Image_Info_Get_Object should be a instance "
+    image_info_dict = config.Parameters.Image_Info_Get_Object.get_image_info(image_path)
     a=3
                       
         
