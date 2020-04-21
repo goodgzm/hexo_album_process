@@ -259,15 +259,28 @@ def json_integrate(temp_root):
         
     return album_dict
         
-def make_dir_and_md_of_album(hexo_photos_path, album_dict):
+def make_dir_json_md_of_album(temp_root, hexo_photos_path, album_dict):
     '''
     save md files to hexo source/photos dir
     '''
     assert os.path.isdir(hexo_photos_path) ,'hexo photos path {hexo_photos_path} does not exist'
     
+    src_album_json_path = os.path.join(temp_root, config.Parameters.Album_Total_Json)
+    assert os.path.exists(src_album_json_path), f'album json file {src_album_json_path} not found'
+    tar_album_json_path = os.path.join(hexo_photos_path, config.Parameters.Album_Total_Json)
+    
+    shutil.copy(src_album_json_path, tar_album_json_path)
+    log(f"json file {config.Parameters.Album_Total_Json} moved to hexo dir")
     for sub_image_dict in album_dict['album']:
+        src_json_path = os.path.join(temp_root, sub_image_dict['directory'], config.Parameters.Album_Ddescription_File_Name)
+        assert os.path.exists(src_json_path), f'sub json file {src_json_path} not found'
+        
+        tar_json_path = os.path.join(hexo_photos_path, sub_image_dict['directory'], config.Parameters.Album_Ddescription_File_Name)
         image_dir = os.path.join(hexo_photos_path, sub_image_dict['directory'])
         dir_check(image_dir)
+        
+        shutil.copyfile(src_json_path, tar_json_path)
+        log(f"json file {sub_image_dict['directory'] +'_'+ config.Parameters.Album_Ddescription_File_Name} moved to hexo dir")
         
         with open(os.path.join(image_dir,config.Parameters.Album_Md_File_Name),'w', encoding='utf-8') as fp:
             fp.writelines('---'+'\n')

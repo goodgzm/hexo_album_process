@@ -16,19 +16,19 @@ class PhotoExifInfo():
             
         self.interested_keys = {
             # camera Model
-            'Image Model':'相机型号',
+            'Image Model':'Image_Model',#'相机型号',
             # Aperture 1/value
-            'EXIF FNumber':'光圈',
+            'EXIF FNumber':'EXIF_FNumber',#'光圈',
             # Focal Length
-            'EXIF FocalLength':'焦距',
+            'EXIF FocalLength':'EXIF_FocalLength',#'焦距',
             # Exposure Mode
-            'EXIF ExposureMode':'曝光模式',
+            'EXIF ExposureMode':'EXIF_ExposureMode',#'曝光模式',
             # ExposureTime in seconds
-            'EXIF ExposureTime':'曝光时间',
+            'EXIF ExposureTime':'EXIF_ExposureTime',#'曝光时间',
             # ISO
-            'EXIF ISOSpeedRatings':'ISO',
+            'EXIF ISOSpeedRatings':'EXIF_ISOSpeedRatings',#'ISO',
             # date of photo
-            'Image DateTime':'拍摄时间',
+            'Image DateTime':'Image_DateTime'#'拍摄时间',
         }
         
         
