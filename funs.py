@@ -209,7 +209,7 @@ def deal_with_sub_json(src_dir, tar_dir):
         for item in file_list:
             extension = item.split('.')[-1]
             
-            if extension in config.Parameters.Image_Extension_List:
+            if extension.lower() in config.Parameters.Image_Extension_List:
                 ## is image file
                 image_path = os.path.join(src_sub_image_path, item)
                 
