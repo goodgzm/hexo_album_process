@@ -61,7 +61,8 @@ class PhotoExifInfo():
                 image_info_dict[self.interested_keys[item]] = info
                 
             except:
-                print(f'{image_path} has no attribute of {item}')                
+                print(f'{image_path} has no attribute of {item}')   
+                image_info_dict[self.interested_keys[item]] = ""
                 continue
             
         try:
