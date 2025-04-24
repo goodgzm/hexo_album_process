@@ -29,10 +29,10 @@ if __name__ =='__main__':
     
     ## make folders and markdowns in dir of photos
     make_dir_json_md_of_album(temp_image_root, hexo_photos_path, album_dict)
-    
+    print("!!!!!!!!!!")
     ## upload images with qshell
     if config.Parameters.Force_Upload:
         os.system("rm -rf ~/.qshell/qupload")
-        
+    print("!!!!!!!!!!")  
     cmd = "qshell qupload "+os.path.join(config.Parameters.Uploading_Temp_Image_Path,config.Parameters.Qshell_Config_File_Name)
     os.system(cmd)
